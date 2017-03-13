@@ -18,7 +18,7 @@ public class PersonDBHandler extends SQLiteOpenHelper {
 
     private static final String TAG = "PersonDBHandler";
 
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 1;
     private static final String DB_NAME = "person.db";
     private static final String DB_TABLE_NAME = "persons";
 
@@ -41,7 +41,7 @@ public class PersonDBHandler extends SQLiteOpenHelper {
     // voor de aanmaak van de database
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.i(TAG, "Creating NEW database");
+        Log.i(TAG, "Creating NEW table " + DB_TABLE_NAME);
         String CREATE_PERSON_TABLE = "CREATE TABLE " + DB_TABLE_NAME +
                 "(" +
                 COLUMN_ID + " INTEGER PRIMARY KEY," +
@@ -58,7 +58,7 @@ public class PersonDBHandler extends SQLiteOpenHelper {
     // Je kiest zelf wat je hier doet - wij verwijderen de oude en installeren de nieuwe db.
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.i(TAG, "onUpgrade - DROPPING EXISTING DATABASE");
+        Log.i(TAG, "onUpgrade - from " + oldVersion + " to " + newVersion + " - DROPPING EXISTING DATABASE");
         db.execSQL("DROP TABLE IF EXISTS " + DB_TABLE_NAME);
         onCreate(db);
     }
@@ -67,7 +67,7 @@ public class PersonDBHandler extends SQLiteOpenHelper {
     // Je kiest zelf wat je hier doet - wij verwijderen de oude en installeren de nieuwe db.
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.i(TAG, "onDowngrade - from " + oldVersion " to " + newVersion + "- DROPPING EXISTING DATABASE");
+        Log.i(TAG, "onDowngrade - from " + oldVersion + " to " + newVersion + " - DROPPING EXISTING DATABASE");
         db.execSQL("DROP TABLE IF EXISTS " + DB_TABLE_NAME);
         onCreate(db);
     }
@@ -113,18 +113,21 @@ public class PersonDBHandler extends SQLiteOpenHelper {
 
     public void findAllPersons() {
 
-        String query_b = "SELECT * FROM " + DB_TABLE_NAME;
+        String query = "SELECT * FROM " + DB_TABLE_NAME;
+        Log.i(TAG, "findAllPersons - " + query);
+        Log.i(TAG, "--------------------------------------------");
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query_b, null);
+        Cursor cursor = db.rawQuery(query, null);
 
-        cursor.moveToFirst();
-        while(cursor.moveToNext() ) {
-            Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_FIRSTNAME)));
-            Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_LASTNAME)));
-            Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_AGE)));
-            Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)));
-            Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_IMAGEURL)));
-            Log.i(TAG, "--------------------------------------------");
+        if (cursor.moveToFirst()) {
+            do {
+                Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_FIRSTNAME)));
+                Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_LASTNAME)));
+                Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_AGE)));
+                Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)));
+                Log.i(TAG, cursor.getString(cursor.getColumnIndex(COLUMN_IMAGEURL)));
+                Log.i(TAG, "--------------------------------------------");
+            } while (cursor.moveToNext());
         }
 
         db.close();
